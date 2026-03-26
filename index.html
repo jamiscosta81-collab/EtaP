@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETAP PRO - James</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --accent: #da3633; --blue: #58a6ff; --green: #3fb950; --warn: #f1e05a; }
+        body { background-color: var(--bg); color: #c9d1d9; font-family: 'Segoe UI', sans-serif; padding-bottom: 80px; }
+        .header-main { background: #1f2328; color: white; padding: 15px; text-align: center; border-bottom: 3px solid var(--accent); }
+        .card-menu { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 15px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; }
+        .card-menu:hover { border-color: var(--blue); background: #1c2128; }
+        .detail-pane { display: none; padding: 20px; }
+        .badge-tech { font-family: monospace; font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; background: #010409; border: 1px solid #444; margin-right: 5px; }
+        .btn-back { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="header-main">
+    <h5 class="m-0 fw-bold">1783-ETAP MASTER GUIDE</h5>
+    <small class="text-muted">MANUAL TÉCNICO AVANÇADO - JAMES</small>
+</div>
+
+<div class="container mt-3" id="main-menu">
+    <div class="card-menu" onclick="show('commissioning')">
+        <strong class="text-blue">⚡ Comissionamento e BootP</strong>
+        <p class="small text-muted m-0">Atribuição de IP, Switches e Reset de Fábrica.</p>
+    </div>
+
+    <div class="card-menu" onclick="show('dlr')">
+        <strong class="text-green">🔄 Topologia DLR (Anel)</strong>
+        <p class="small text-muted m-0">Ring Supervisor, Beacon Interval e Fault Recovery.</p>
+    </div>
+
+    <div class="card-menu" onclick="show('smartports')">
+        <strong class="text-warn">🛠️ Smart Ports & IGMP</strong>
+        <p class="small text-muted m-0">Otimização de tráfego e perfis de porta.</p>
+    </div>
+
+    <div class="card-menu" onclick="show('diagnostics')">
+        <strong class="text-white">🔍 Diagnóstico de Mídia</strong>
+        <p class="small text-muted m-0">Erros de CRC, Duplex Missmatch e SNR.</p>
+    </div>
+</div>
+
+<div class="container detail-pane" id="detail-pane">
+    <button class="btn btn-sm btn-outline-light btn-back" onclick="hide()">← VOLTAR</button>
+    <div id="detail-content"></div>
+</div>
+
+<script>
+    const data = {
+        commissioning: `
+            <h4>⚡ Comissionamento Avançado</h4>
+            <div class="mt-3">
+                <p><strong>Switches Rotativos:</strong></p>
+                <ul>
+                    <li><span class="badge-tech text-info">000</span> Modo DHCP/BootP. Use Rockwell BootP Tool.</li>
+                    <li><span class="badge-tech text-info">001-254</span> IP Fixo Hard-coded (192.168.1.xxx).</li>
+                    <li><span class="badge-tech text-info">888</span> Factory Reset: Cycle power para limpar configs.</li>
+                    <li><span class="badge-tech text-info">999</span> Modo Memória: Mantém o IP configurado via Soft.</li>
+                </ul>
+                <hr>
+                <p><strong>Disable BootP/DHCP:</strong> Após atribuir IP no software, o ETAP continuará pedindo IP no próximo boot se você não clicar em "Disable BootP/DHCP".</p>
+            </div>
+        `,
+        dlr: `
+            <h4>🔄 Device Level Ring (DLR)</h4>
+            <div class="mt-3">
+                <p>O ETAP pode ser <strong>Supervisor</strong> ou <strong>Node</strong>.</p>
+                <ul>
+                    <li><strong>Ring Supervisor:</strong> Pelo menos um ETAP ou EN2TR deve ser supervisor.</li>
+                    <li><strong>Beacon Interval:</strong> Ajuste para 400µs em redes críticas.</li>
+                    <li><strong>Beacon Timeout:</strong> 1960µs padrão.</li>
+                </ul>
+                <div class="alert alert-dark border-secondary small">
+                    <strong>Dica de Campo:</strong> Se o LED 'Network' pisca vermelho, o anel está aberto (Ring Fault). Verifique as portas P1 e P2.
+                </div>
+            </div>
+        `,
+        smartports: `
+            <h4>🛠️ Configurações de Porta</h4>
+            <div class="mt-3">
+                <p><strong>Smart Port Profiles:</strong></p>
+                <ul>
+                    <li><strong>Automation Device:</strong> Para PLCs e Drives.</li>
+                    <li><strong>Multiport:</strong> Para switches vizinhos.</li>
+                    <li><strong>Virtual Automation Device:</strong> Para máquinas virtuais.</li>
+                </ul>
+                <p><strong>IGMP Snooping:</strong> Deve estar ATIVO se houver muitos dispositivos produzindo dados simultâneos para evitar sobrecarga.</p>
+            </div>
+        `,
+        diagnostics: `
+            <h4>🔍 Diagnóstico de Mídia</h4>
+            <div class="mt-3">
+                <p>Acesse o Web Server (IP do módulo) e verifique:</p>
+                <ul>
+                    <li><strong>Alignment Errors:</strong> Indica cabo mal crimpado ou ruído eletromagnético.</li>
+                    <li><strong>FCS Errors:</strong> Geralmente falha física na porta ou cabo.</li>
+                    <li><strong>Duplex:</strong> Garanta que esteja em "Auto-Negotiate" em ambos os lados.</li>
+                </ul>
+            </div>
+        `
+    };
+
+    function show(key) {
+        document.getElementById('main-menu').style.display = 'none';
+        document.getElementById('detail-pane').style.display = 'block';
+        document.getElementById('detail-content').innerHTML = data[key];
+    }
+
+    function hide() {
+        document.getElementById('main-menu').style.display = 'block';
+        document.getElementById('detail-pane').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
