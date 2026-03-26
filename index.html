@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b1118" />
+  <meta name="description" content="ETAP Field Trainer - app offline para aprender, cadastrar e trocar ETAP com segurança." />
+  <title>ETAP Field Trainer</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand-wrap">
+        <div class="brand-mark">ET</div>
+        <div>
+          <div class="brand-title">ETAP</div>
+          <div class="brand-sub">Treinamento de Campo</div>
+        </div>
+      </div>
+
+      <button class="mobile-close" id="closeSidebar">×</button>
+
+      <nav class="nav" aria-label="Navegação principal">
+        <button class="nav-btn active" data-section="dashboard"><span>▣</span> Dashboard</button>
+        <button class="nav-btn" data-section="aprendizado"><span>◎</span> Aprender</button>
+        <button class="nav-btn" data-section="banco"><span>▤</span> Banco ETAP</button>
+        <button class="nav-btn" data-section="troca"><span>⇄</span> Troca guiada</button>
+        <button class="nav-btn" data-section="quiz"><span>?</span> Quiz</button>
+        <button class="nav-btn" data-section="historico"><span>◷</span> Histórico</button>
+        <button class="nav-btn" data-section="relatorio"><span>⎙</span> Relatório</button>
+      </nav>
+
+      <section class="side-card">
+        <div class="side-title">Modo do técnico</div>
+        <div class="chip-row">
+          <button class="mode-chip active" data-mode="aprendiz">Aprendiz</button>
+          <button class="mode-chip" data-mode="assistido">Assistido</button>
+          <button class="mode-chip" data-mode="especialista">Especialista</button>
+        </div>
+        <p id="modeText" class="side-desc"></p>
+      </section>
+
+      <section class="side-card">
+        <div class="side-title">Dados locais</div>
+        <div class="stack-actions">
+          <button id="exportData" class="btn btn-soft full">Exportar JSON</button>
+          <label class="btn btn-soft full file-btn">Importar JSON<input id="importData" type="file" accept="application/json" /></label>
+          <button id="resetDemo" class="btn btn-danger-soft full">Restaurar demo</button>
+        </div>
+      </section>
+    </aside>
+
+    <div class="main-wrap">
+      <header class="topbar">
+        <div class="top-left">
+          <button id="openSidebar" class="icon-btn mobile-only">☰</button>
+          <div>
+            <h1 id="pageTitle">Dashboard operacional</h1>
+            <p id="pageSubtitle">Aprendizado embarcado, banco local e troca guiada com rastreabilidade.</p>
+          </div>
+        </div>
+        <div class="top-right">
+          <div class="status-pill success">Offline pronto</div>
+          <div class="status-pill neutral" id="clockNow">--:--</div>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="view active" id="dashboard">
+          <div class="hero panel">
+            <div class="hero-copy">
+              <div class="eyebrow">Painel principal</div>
+              <h2>Troca de ETAP com método, visual de sistema industrial e aprendizado real de campo</h2>
+              <p>Este app foi fechado para virar ferramenta de uso real: ensina o técnico, trava o fluxo crítico, registra intervenção e deixa o processo pronto para auditoria interna.</p>
+              <div class="cta-row">
+                <button class="btn btn-primary jump" data-target="troca">Iniciar troca guiada</button>
+                <button class="btn btn-soft jump" data-target="aprendizado">Abrir treinamento</button>
+              </div>
+            </div>
+            <div class="hero-stats">
+              <article class="metric green"><span>ETAPs cadastrados</span><strong id="mEtaps">0</strong></article>
+              <article class="metric blue"><span>Trocas registradas</span><strong id="mTrocas">0</strong></article>
+              <article class="metric amber"><span>Média no quiz</span><strong id="mQuiz">0%</strong></article>
+              <article class="metric violet"><span>Última troca</span><strong id="mLast">Nenhuma</strong></article>
+            </div>
+          </div>
+
+          <div class="grid two-one">
+            <article class="panel reference-card">
+              <div class="panel-head between">
+                <div>
+                  <div class="eyebrow">Referência visual</div>
+                  <h3>Linha visual dark dashboard</h3>
+                </div>
+                <span class="badge">Industrial premium</span>
+              </div>
+              <img class="hero-image" src="assets/referencia_dashboard.jpg" alt="Referência de dashboard escuro" />
+            </article>
+
+            <article class="panel quick-panel">
+              <div class="panel-head">
+                <div>
+                  <div class="eyebrow">Fluxo mínimo seguro</div>
+                  <h3>Sem isso, não fecha</h3>
+                </div>
+              </div>
+              <ul class="check-list">
+                <li>Registrar TAG, IP e MAC antigos</li>
+                <li>Conferir DIP switches S1, S2 e S3</li>
+                <li>Instalar sobressalente compatível</li>
+                <li>Validar ping, web, scanner ou RSLinx</li>
+                <li>Registrar técnico e lição aprendida</li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="kpi-grid">
+            <article class="kpi panel">
+              <div class="kpi-label">Modo ativo</div>
+              <div class="kpi-value" id="kpiMode">Aprendiz</div>
+              <p>Explicação máxima e travas completas.</p>
+            </article>
+            <article class="kpi panel">
+              <div class="kpi-label">Armazenamento</div>
+              <div class="kpi-value">Local + Offline</div>
+              <p>Os dados ficam no navegador e podem ser exportados.</p>
+            </article>
+            <article class="kpi panel">
+              <div class="kpi-label">Modelo base</div>
+              <div class="kpi-value">1783-ETAP1F/A</div>
+              <p>Fluxo iniciado com o cenário real das suas imagens.</p>
+            </article>
+            <article class="kpi panel">
+              <div class="kpi-label">Uso recomendado</div>
+              <div class="kpi-value">Campo + Treinamento</div>
+              <p>Serve tanto para capacitar quanto para executar.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="aprendizado">
+          <div class="grid two-one">
+            <article class="panel lesson-panel">
+              <div class="panel-head between">
+                <div>
+                  <div class="eyebrow">Aprender vendo</div>
+                  <h3>Trilha visual com imagens reais</h3>
+                </div>
+                <div class="tabs" id="lessonTabs"></div>
+              </div>
+              <div class="lesson-layout">
+                <div class="lesson-media-wrap">
+                  <img id="lessonImage" class="lesson-image" alt="Imagem do treinamento" />
+                </div>
+                <div class="lesson-copy">
+                  <h4 id="lessonTitle"></h4>
+                  <p id="lessonText"></p>
+                  <ul id="lessonPoints" class="check-list alt"></ul>
+                </div>
+              </div>
+            </article>
+
+            <article class="panel summary-panel">
+              <div class="panel-head">
+                <div>
+                  <div class="eyebrow">Resumo do produto</div>
+                  <h3>O que o técnico precisa gravar</h3>
+                </div>
+              </div>
+              <div class="fact-list">
+                <div><span>Produto</span><strong>1783-ETAP1F/A</strong></div>
+                <div><span>Identificação crítica</span><strong>TAG + IP + MAC</strong></div>
+                <div><span>Validação mínima</span><strong>Ping ou Web ou Scanner</strong></div>
+                <div><span>Erro comum</span><strong>Trocar sem registrar dados antigos</strong></div>
+                <div><span>Objetivo do app</span><strong>Padronizar e ensinar</strong></div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="banco">
+          <div class="grid one-two">
+            <article class="panel form-panel">
+              <div class="panel-head">
+                <div>
+                  <div class="eyebrow">Cadastro mestre</div>
+                  <h3>Novo ETAP / editar ETAP</h3>
+                </div>
+              </div>
+              <form id="etapForm" class="form-grid">
+                <input id="etapId" type="hidden" />
+                <label>TAG<input id="tag" required placeholder="Ex.: ETAP-PA-LINK-B" /></label>
+                <label>Modelo<input id="modelo" required placeholder="Ex.: 1783-ETAP1F/A" /></label>
+                <label>IP<input id="ip" placeholder="192.168.6.241" /></label>
+                <label>MAC<input id="mac" placeholder="00:1D:9C:BE:E0:B2" /></label>
+                <label>Área<input id="area" placeholder="Ex.: PA Link/B" /></label>
+                <label>Painel<input id="painel" placeholder="Ex.: Painel principal" /></label>
+                <label>Firmware<input id="firmware" placeholder="Ex.: rev. A" /></label>
+                <label>Técnico responsável<input id="tecnico" placeholder="Nome do técnico" /></label>
+                <label>S1<select id="s1"><option>OFF</option><option>ON</option></select></label>
+                <label>S2<select id="s2"><option>OFF</option><option>ON</option></select></label>
+                <label>S3<select id="s3"><option>OFF</option><option>ON</option></select></label>
+                <label class="full">Observações<textarea id="obs" rows="4" placeholder="Notas importantes, peculiaridades, evidências..."></textarea></label>
+                <div class="full form-actions">
+                  <button class="btn btn-primary" type="submit">Salvar ETAP</button>
+                  <button class="btn btn-soft" id="clearForm" type="button">Limpar</button>
+                </div>
+              </form>
+            </article>
+
+            <article class="panel list-panel">
+              <div class="panel-head between">
+                <div>
+                  <div class="eyebrow">Banco operacional</div>
+                  <h3>Equipamentos cadastrados</h3>
+                </div>
+                <input id="searchEtap" class="search" placeholder="Buscar por TAG, IP, MAC, área ou painel" />
+              </div>
+              <div id="etapList" class="list-grid"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="troca">
+          <div class="grid two-one">
+            <article class="panel wizard-panel">
+              <div class="panel-head between">
+                <div>
+                  <div class="eyebrow">Assistente de campo</div>
+                  <h3>Troca guiada do ETAP</h3>
+                </div>
+                <span class="badge" id="wizardBadge">Etapa 1 de 6</span>
+              </div>
+              <div class="wizard-track">
+                <div class="progress"><span id="wizardProgress"></span></div>
+                <div id="wizardDots" class="wizard-dots"></div>
+              </div>
+              <div class="wizard-box">
+                <h4 id="wizardTitle"></h4>
+                <p id="wizardDescription"></p>
+                <div id="wizardContent"></div>
+                <div class="wizard-actions">
+                  <button id="wizardPrev" class="btn btn-soft">Voltar</button>
+                  <button id="wizardNext" class="btn btn-primary">Avançar</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="panel rules-panel">
+              <div class="panel-head">
+                <div>
+                  <div class="eyebrow">Lógica pedagógica</div>
+                  <h3>Como o app ensina</h3>
+                </div>
+              </div>
+              <ul class="check-list">
+                <li>Uma ação por vez</li>
+                <li>Texto curto, direto e operacional</li>
+                <li>Validação antes de avançar</li>
+                <li>Resumo e lição aprendida no fim</li>
+                <li>O técnico pratica enquanto registra</li>
+              </ul>
+              <div class="notice">
+                <strong>Observação:</strong> em <b>Aprendiz</b>, as orientações são completas. Em <b>Especialista</b>, o texto é reduzido e o fluxo vai direto ao ponto.
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="quiz">
+          <article class="panel">
+            <div class="panel-head between">
+              <div>
+                <div class="eyebrow">Reforço de retenção</div>
+                <h3>Quiz rápido do técnico</h3>
+              </div>
+              <span id="quizStatus" class="badge">Ainda não corrigido</span>
+            </div>
+            <div id="quizList" class="quiz-list"></div>
+            <div class="form-actions">
+              <button id="submitQuiz" class="btn btn-primary">Corrigir quiz</button>
+              <button id="resetQuiz" class="btn btn-soft">Refazer</button>
+            </div>
+            <div id="quizResult" class="result hidden"></div>
+          </article>
+        </section>
+
+        <section class="view" id="historico">
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <div class="eyebrow">Rastreabilidade</div>
+                <h3>Histórico de substituições</h3>
+              </div>
+            </div>
+            <div id="historyList" class="timeline"></div>
+          </article>
+        </section>
+
+        <section class="view" id="relatorio">
+          <div class="grid one-one">
+            <article class="panel">
+              <div class="panel-head between">
+                <div>
+                  <div class="eyebrow">Consolidação</div>
+                  <h3>Resumo operacional</h3>
+                </div>
+                <div class="cta-row compact">
+                  <button id="generateSnapshot" class="btn btn-soft">Gerar resumo</button>
+                  <button id="printReport" class="btn btn-primary">Imprimir / PDF</button>
+                </div>
+              </div>
+              <div id="reportStats" class="stats-grid"></div>
+            </article>
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <div class="eyebrow">Texto final</div>
+                  <h3>Relatório pronto</h3>
+                </div>
+              </div>
+              <textarea id="reportText" class="report-text" rows="20"></textarea>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
