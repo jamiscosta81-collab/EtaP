@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETAP ENGINEER TOOL | James</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { 
+            --bg: #05070a; --card: #0d1117; --border: #30363d; 
+            --accent: #ff3e3e; --blue: #58a6ff; --cyan: #39ff14; --warn: #d29922;
+        }
+        body { 
+            background-color: var(--bg); color: #c9d1d9; 
+            font-family: 'Consolas', 'Monaco', monospace; font-size: 0.85rem; 
+        }
+        .header-eng { 
+            background: #161b22; border-bottom: 2px solid var(--accent); 
+            padding: 15px; position: sticky; top: 0; z-index: 1000; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .sidebar-nav { 
+            background: #0d1117; border-right: 1px solid var(--border); 
+            height: calc(100vh - 60px); position: sticky; top: 60px; 
+            padding-top: 15px; overflow-y: auto; 
+        }
+        .nav-link { 
+            color: #8b949e; border-left: 3px solid transparent; 
+            cursor: pointer; padding: 10px 15px; transition: 0.2s; 
+        }
+        .nav-link:hover { background: #161b22; color: #fff; }
+        .nav-link.active { border-left-color: var(--accent); background: #1c2128; color: #fff; font-weight: bold; }
+        .content-area { padding: 25px; min-height: 100vh; }
+        .tech-table { width: 100%; border: 1px solid #30363d; margin: 15px 0; }
+        .tech-table th { background: #161b22; padding: 12px; border: 1px solid #30363d; color: var(--blue); text-transform: uppercase; }
+        .tech-table td { padding: 10px; border: 1px solid #30363d; }
+        .code-block { background: #000; padding: 15px; border-radius: 4px; border: 1px solid var(--border); color: var(--cyan); margin: 10px 0; }
+        .warning-box { border-left: 5px solid var(--warn); background: rgba(210, 153, 34, 0.1); padding: 15px; margin: 20px 0; color: #e3b341; }
+        .msg-box { border: 1px solid var(--blue); padding: 15px; background: rgba(88, 166, 255, 0.05); border-radius: 5px; }
+        h4 { color: #fff; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 25px; text-transform: uppercase; }
+        b { color: var(--blue); }
+    </style>
+</head>
+<body>
+
+<div class="header-eng shadow">
+    <div><span style="color:var(--accent); font-weight:bold;">[SYS]</span> 1783-ETAP_MASTER_V3.0</div>
+    <small class="text-muted">OPERATOR: JAMES | ENG_MODE</small>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Navigation -->
+        <nav class="col-md-3 col-lg-2 sidebar-nav d-none d-md-block">
+            <h6 class="px-3 text-muted small text-uppercase mb-3">L1 / L2 Physical</h6>
+            <div class="nav-link active" onclick="load('specs')">Hardware Specs</div>
+            <div class="nav-link" onclick="load('switches')">Rotary Switches</div>
+            <div class="nav-link" onclick="load('pinout')">Cabling / Pinout</div>
+            
+            <h6 class="px-3 text-muted small text-uppercase mt-4 mb-3">L3 / Config</h6>
+            <div class="nav-link" onclick="load('tcpip')">TCP/IP Object</div>
+            <div class="nav-link" onclick="load('dlr_deep')">DLR Specs</div>
+            
+            <h6 class="px-3 text-muted small text-uppercase mt-4 mb-3">Automation / MSG</h6>
+            <div class="nav-link" onclick="load('msg_reset')">Remote Reset (MSG)</div>
+            <div class="nav-link" onclick="load('objects')">CIP Mapping</div>
+            
+            <h6 class="px-3 text-muted small text-uppercase mt-4 mb-3">Support</h6>
+            <div class="nav-link" onclick="load('errors')">Media Counters</div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="col-md-9 col-lg-10 content-area">
+            <div id="display">
+                <!-- Início Padrão -->
+                <h4>Hardware Specifications & Environment</h4>
+                <table class="tech-table text-white">
+                    <tr><th>Parameter</th><th>Specification</th></tr>
+                    <tr><td><b>Voltage</b></td><td>24V DC (20.4…26.4V DC)</td></tr>
+                    <tr><td><b>Max Current</b></td><td>125 mA @ 24V DC</td></tr>
+                    <tr><td><b>Temp Range</b></td><td>-25…70 °C (-13…158 °F)</td></tr>
+                    <tr><td><b>Dissipation</b></td><td>3.0 Watts (10.2 BTU/hr)</td></tr>
+                    <tr><td><b>Isolation</b></td><td>30V Continuous (Port-to-System)</td></tr>
+                </table>
+                <div class="warning-box">
+                    <b>FIBER OPTIC NOTE (1783-ETAP1F):</b> Módulo de fibra utiliza conectores LC Multimodo. Orçamento óptico de 8dB. Não suporta conexões Half-Duplex.
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    const db = {
+        switches: `
+            <h4>Rotary Switches Logic (S1, S2, S3)</h4>
+            <p>Os seletores definem a inicialização do stack de rede (TCP/IP Class 0xF5).</p>
+            <table class="tech-table">
+                <tr><th>Posição</th><th>Modo</th><th>Ação do Firmware</th></tr>
+                <tr><td>000</td><td><b>DHCP / BootP</b></td><td>Aguarda IP de servidor externo.</td></tr>
+                <tr><td>001 - 254</td><td><b>Fixed IP</b></td><td>Força 192.168.1.XXX (Masc 255.255.255.0).</td></tr>
+                <tr><td>888</td><td><b>Reset</b></td><td>Restaura todos os parâmetros de fábrica.</td></tr>
+                <tr><td>999</td><td><b>Memória Flash</b></td><td>Carrega configurações salvas via software.</td></tr>
+            </table>
+        `,
+        pinout: `
+            <h4>Physical Connectivity & Pinout</h4>
+            <div class="code-block">
+                <b>RJ45 Standard (TIA-568B):</b><br>
+                1: Org/Wht (TD+) | 2: Org (TD-)<br>
+                3: Grn/Wht (RD+) | 6: Grn (RD-)
+            </div>
+            <div class="code-block">
+                <b>M12 D-Coded (Circular):</b><br>
+                1: Yel (TD+) | 2: Wht (RD+)<br>
+                3: Org (TD-) | 4: Blu (RD-)
+            </div>
+            <div class="warning-box">
+                <b>CABLING:</b> Recomenda-se cabo blindado Cat5e STP para evitar Alignment Errors causados por interferência de motores.
+            </div>
+        `,
+        tcpip: `
+            <h4>TCP/IP Interface Object (Class 0xF5)</h4>
+            <table class="tech-table">
+                <tr><th>Attr</th><th>Descrição</th><th>Data Type</th></tr>
+                <tr><td>1</td><td>Status (0=Configuring, 1=Valid Config)</td><td>DWORD</td></tr>
+                <tr><td>3</td><td>Config Control (0=Static, 1=BootP, 2=DHCP)</td><td>DWORD</td></tr>
+                <tr><td>5</td><td>Interface Config (IP, Subnet, Gateway)</td><td>STRUCT</td></tr>
+            </table>
+            <div class="code-block">
+                Para mudar IP via PLC: Atributo 5 da Classe 0xF5.
+            </div>
+        `,
+        dlr_deep: `
+            <h4>DLR v2 Network Specifications</h4>
+            <ul>
+                <li><b>Ring Supervisor:</b> Necessário 1 dispositivo ativo no anel.</li>
+                <li><b>Beacon Interval:</b> 400 μs (Padrão Rockwell).</li>
+                <li><b>VLAN Tagging:</b> Tagging 802.1Q obrigatório para tráfego DLR.</li>
+                <li><b>Ring Fault LED:</b> Network LED pisca vermelho quando o anel está aberto.</li>
+            </ul>
+        `,
+        msg_reset: `
+            <h4>Remote Reset via MSG Instruction</h4>
+            <p>Comando para reiniciar o módulo via Studio 5000 (CIP Generic).</p>
+            <div class="msg-box">
+                <b>Configuração MSG:</b><br>
+                • <b>Service Code:</b> 0x05 (Reset)<br>
+                • <b>Class:</b> 0x01 (Identity)<br>
+                • <b>Instance:</b> 1<br>
+                • <b>Source Data:</b> 0 = Power Cycle / 1 = Factory Reset
+            </div>
+        `,
+        objects: `
+            <h4>CIP Object Mapping (Manual UM001)</h4>
+            <table class="tech-table">
+                <tr><th>Class</th><th>Attr</th><th>Function</th></tr>
+                <tr><td>0x47 (DLR)</td><td>1</td><td>Network Mode (1=Linear, 2=Ring)</td></tr>
+                <tr><td>0x47 (DLR)</td><td>2</td><td>Network Status (0=Normal, 1=Fault)</td></tr>
+                <tr><td>0xF6 (Eth)</td><td>7</td><td>Media Counters (In/Out Octets, Errors)</td></tr>
+            </table>
+        `,
+        errors: `
+            <h4>Troubleshooting: Media Counters</h4>
+            <ul>
+                <li><b>FCS Errors:</b> Falha no CRC. Indica ruído eletromagnético ou má crimpagem.</li>
+                <li><b>Alignment Errors:</b> Pacotes cortados. Falha física na porta ou cabo quebrado.</li>
+                <li><b>Inbound Discards:</b> Saturação de tráfego. Porta Device operando acima do limite.</li>
+            </ul>
+        `
+    };
+
+    function load(key) {
+        document.getElementById('display').innerHTML = db[key];
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+            if(link.getAttribute('onclick').includes(key)) link.classList.add('active');
+        });
+        window.scrollTo(0, 0);
+    }
+</script>
+
+</body>
+</html>
