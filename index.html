@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETAP Master PRO - James</title>
+    <link rel="manifest" href="manifest.json">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { 
+            --bg: #0d1117; --card: #161b22; --border: #30363d; 
+            --accent: #da3633; --blue: #58a6ff; --green: #3fb950; --warn: #f1e05a; 
+        }
+        body { background-color: var(--bg); color: #c9d1d9; font-family: 'Segoe UI', system-ui, sans-serif; padding-bottom: 50px; }
+        
+        /* Header Profissional */
+        .header-main { background: #1f2328; color: white; padding: 20px; text-align: center; border-bottom: 3px solid var(--accent); margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        
+        /* Menu de Navegação Superior */
+        .nav-pills .nav-link { color: #8b949e; border-radius: 20px; font-size: 0.85rem; border: 1px solid transparent; margin: 0 5px; }
+        .nav-pills .nav-link.active { background-color: var(--accent); color: white; border-color: var(--accent); }
+
+        /* Cards e Layout */
+        .card-custom { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 15px; transition: 0.3s; cursor: pointer; }
+        .card-custom:hover { border-color: var(--blue); transform: translateY(-3px); }
+        
+        /* Detalhes Técnicos */
+        .tech-box { background: #010409; border-left: 4px solid var(--blue); padding: 15px; border-radius: 4px; margin: 10px 0; font-size: 0.9rem; }
+        .badge-code { background: #30363d; color: var(--warn); padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+        
+        /* Visual das Portas */
+        .port-diagram { display: flex; justify-content: space-around; background: #010409; border: 1px solid #444; border-radius: 8px; padding: 20px; margin: 15px 0; }
+        .port-led { width: 45px; height: 45px; border: 2px solid #666; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 4px; font-size: 0.8rem; }
+        .port-active { border-color: var(--green); color: var(--green); box-shadow: 0 0 5px var(--green); }
+        
+        #detail-view { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="header-main">
+    <h5 class="m-0 fw-bold text-uppercase">1783-ETAP Specialist App</h5>
+    <small class="text-muted">GUIA AVANÇADO DE CAMPO - JAMES</small>
+</div>
+
+<div class="container" id="main-view">
+    <!-- Seção de Árvore de Decisão Rápida -->
+    <div class="row g-3 mb-4">
+        <div class="col-6">
+            <div class="card-custom border-success text-center" onclick="showSection('diag_ok')">
+                <h3 class="text-success fw-bold">IP OK</h3>
+                <small class="text-muted">Diagnóstico Web/Linx</small>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card-custom border-danger text-center" onclick="showSection('no_ip')">
+                <h3 class="text-danger fw-bold">SEM IP</h3>
+                <small class="text-muted">BootP/Reset/Switch</small>
+            </div>
+        </div>
+    </div>
+
+    <h6 class="text-uppercase text-muted mb-3 small fw-bold">Módulos de Configuração Avançada</h6>
+    
+    <div class="card-custom" onclick="showSection('dlr_master')">
+        <strong class="text-white d-block">🔄 Topologia DLR (Device Level Ring)</strong>
+        <small class="text-muted">Ring Supervisor, Beacon Timeout e Fault Analysis.</small>
+    </div>
+
+    <div class="card-custom" onclick="showSection('smart_ports')">
+        <strong class="text-white d-block">🛠️ Smart Ports & IGMP Snooping</strong>
+        <small class="text-muted">Perfis de porta e otimização de tráfego Multicast.</small>
+    </div>
+
+    <div class="card-custom" onclick="showSection('admin_access')">
+        <strong class="text-white d-block">🔑 Acesso Administrador & SNMP</strong>
+        <small class="text-muted">Credenciais via MAC ID e monitoramento remoto.</small>
+    </div>
+</div>
+
+<!-- View Detalhada -->
+<div class="container" id="detail-view">
+    <button class="btn btn-sm btn-outline-light mb-4" onclick="hideSection()">← VOLTAR AO MENU</button>
+    <div id="detail-content"></div>
+</div>
+
+<script>
+    const content = {
+        diag_ok: `
+            <h4 class="text-success">Cenário: Dispositivo Online</h4>
+            <div class="tech-box">
+                <strong>1. Verificação via Web Server:</strong> No navegador, acesse o IP. Vá em <i>Port Statistics</i>. Procure por <b>FCS Errors</b> ou <b>Alignment Errors</b> (indicam falha física no cabo ou conector).
+                <br><br>
+                <strong>2. Diagnóstico RSLinx:</strong> Use o driver EtherNet/IP. Clique com o botão direito no módulo > <i>Module Configuration</i> para ver o status do anel DLR em tempo real.
+            </div>
+        `,
+        no_ip: `
+            <h4 class="text-danger">Cenário: Perda de Comunicação / Novo</h4>
+            <div class="tech-box">
+                <strong>Prioridade 1 - Hardware:</strong> Verifique os switches S1-S2-S3.
+                <br>• <span class="badge-code">000</span>: Modo BootP/DHCP ativo.
+                <br>• <span class="badge-code">001-254</span>: IP será 192.168.1.XXX.
+                <br>• <span class="badge-code">888</span>: Reset para padrão de fábrica.
+                <br>• <span class="badge-code">999</span>: Carrega IP da memória não volátil.
+            </div>
+            <div class="tech-box">
+                <strong>Prioridade 2 - Software:</strong> Use o BootP DHCP Tool. Capture o <b>MAC ID</b>. Após atribuir o IP, clique em <b class="text-warning">Disable BootP/DHCP</b> para evitar perda de IP no reboot.
+            </div>
+        `,
+        dlr_master: `
+            <h4 class="text-primary">🔄 Configuração de Anel (DLR)</h4>
+            <p class="small">O 1783-ETAP é essencial para topologias em anel.</p>
+            <ul>
+                <li><strong>Ring Supervisor:</strong> Deve estar habilitado se não houver um PLC ControlLogix fazendo essa função.</li>
+                <li><strong>Beacon Interval:</strong> 400 microsegundos (Padrão Rockwell).</li>
+                <li><strong>VLAN ID:</strong> Por padrão é 0. Não altere a menos que a rede industrial seja segmentada.</li>
+            </ul>
+            <div class="alert alert-dark small border-secondary">
+                Dica: O LED 'Network' piscando vermelho indica que o anel está "Broken" (aberto).
+            </div>
+        `,
+        smart_ports: `
+            <h4 class="text-warn">🛠️ Smart Ports & Tráfego</h4>
+            <p>O ETAP gerencia o tráfego de forma inteligente:</p>
+            <div class="tech-box">
+                <strong>Smart Port Profiles:</strong>
+                <br>• <i>Automation Device:</i> Otimizado para I/O e Inversores.
+                <br>• <i>Multiport:</i> Para cascatear com outros ETAPs.
+                <br><br>
+                <strong>IGMP Snooping:</strong> Garante que dados multicast (EtherNet/IP) só cheguem onde são solicitados. Mantenha <b>Enabled</b> em redes complexas.
+            </div>
+        `,
+        admin_access: `
+            <h4 class="text-white">🔑 Segurança e Acesso</h4>
+            <div class="tech-box">
+                <strong>Login Padrão:</strong>
+                <br>Usuário: <span class="badge-code">admin</span>
+                <br>Senha: <span class="badge-code">[MAC ID do Módulo]</span>
+                <br><br>
+                <strong>Recuperação:</strong> Se a senha foi alterada e perdida, coloque os switches em <b>888</b>, reinicie, e a senha voltará a ser o MAC ID da etiqueta lateral.
+            </div>
+        `
+    };
+
+    function showSection(id) {
+        document.getElementById('main-view').style.display = 'none';
+        document.getElementById('detail-view').style.display = 'block';
+        document.getElementById('detail-content').innerHTML = content[id];
+        window.scrollTo(0, 0);
+    }
+
+    function hideSection() {
+        document.getElementById('main-view').style.display = 'block';
+        document.getElementById('detail-view').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
